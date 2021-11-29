@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  product_name: 90K IPA
+
+two:
+  product_name: 255 Amber Ale
+
+three:
+  product_name: Chocolate Peanut Butter Porter
+
+four:
+  product_name: Flashpoint Cream Ale
+
+five:
+  product_name: WacTown Wheat
+
+six:
+  product_name: Carver County Kolsch
+
+seven:
+  product_name: Raspberry Blonde
+
+eight: 
+  product_name: Cookies and Cream Milk Stout

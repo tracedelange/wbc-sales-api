@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+jj:
+  id: 1
+  name: JJ Taylor
+
+locher:
+  id: 2
+  name: Locher Brother
+
+wbc:
+  id: 3
+  name: WBC
