@@ -132,7 +132,7 @@ class ReportsController < ApplicationController
           @account.orders.create(sale_date: order['SalesDate'].split(' ')[0], product_id: distributer_product.product_id)
           stats = {**stats, "assignedOrders" => stats["assignedOrders"] + 1}
         else
-          @account.unknown_orders.create(sale_date: order['SalesDate'].split(' ')[0], distributer_product_id: distributer_product.id)
+          @account.unknown_orders.create(sale_date: order['SalesDate'].split(' ')[0], distributer_product_id: distributer_product.id, distributer_id: 1)
           stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
         end
       end

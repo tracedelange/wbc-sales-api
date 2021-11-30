@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resources :reports, only: [:index, :create]
-  resources :distributers, only: [:index]
+  resources :distributers, only: [:index, :show]
   resources :products
 
   post '/login', to: 'sessions#create'
