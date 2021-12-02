@@ -27,9 +27,11 @@ class ReportsController < ApplicationController
         when 2
 
           #Process Locher Report
-          render json: {"dis" => "Locher Bros"}
+          results = process_locher_report(report)
+
+          render json: {"results" => results}
           
-          s
+
         when 3
           #Process Self report
           render json: {"dis" => "WBC"}
@@ -53,8 +55,148 @@ class ReportsController < ApplicationController
 
   private
 
-  def process_jj_report(inputHash)
 
+  def process_wbc_report(inputHash)
+
+
+    stats = {"newAccounts" => 0, "assignedOrders" => 0, "unassignedOrders" => 0}
+
+    # product_list = Product.pluck(:product_name)
+    # jarow = FuzzyStringMatch::JaroWinkler.create( :pure )
+
+    begin
+      @last_wbc_order = Distributer.third.orders.order("sale_date DESC").take.sale_date
+    rescue
+      begin
+        @last_wbc_order = Distributer.second.unknown_orders.order("sale_date DESC").take.sale_date
+      rescue
+        puts 'first time, no reference date'
+      end
+    end
+
+    inputHash.each do |order|
+
+      sale_date = Date.strptime(order['Delivery Date'].split(' ')[0], "%m/%d/%Y")
+
+      if @last_wbc_order
+        if sale_date <= @last_wbc_order
+          next
+        end
+      end
+
+      @account = Account.find_by(account_name: order["Compan"])
+
+      if !@account #account does not exist, create it.
+
+        # if order['IsOffPremise'] == 'FALSE'
+        # else
+        #   on_premise = false
+        # end
+        on_premise = true
+
+
+        @account = Account.create(
+          account_name: order["Company"],
+          distributer_id: 3,
+          on_premise: on_premise
+        )
+        stats = {**stats, "newAccounts" => stats["newAccounts"] + 1}
+      end
+
+      distributer_product = DistributerProduct.find_by(name: order['Item'])
+
+
+      if !distributer_product
+        distributer_product = DistributerProduct.create(name: order['Item'], distributer_id: 3)
+
+        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id)
+        stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
+      else
+        if distributer_product.product_id
+          
+          @account.orders.create(sale_date: sale_date, product_id: distributer_product.product_id)
+          stats = {**stats, "assignedOrders" => stats["assignedOrders"] + 1}
+        else
+          
+          @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id, distributer_id: 3)
+          stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
+        end
+      end
+
+    end
+  end
+
+  def process_locher_report(inputHash)
+
+
+    stats = {"newAccounts" => 0, "assignedOrders" => 0, "unassignedOrders" => 0}
+
+    # product_list = Product.pluck(:product_name)
+    # jarow = FuzzyStringMatch::JaroWinkler.create( :pure )
+
+    begin
+      @last_locher_order = Distributer.second.orders.order("sale_date DESC").take.sale_date
+    rescue
+      begin
+        @last_locher_order = Distributer.second.unknown_orders.order("sale_date DESC").take.sale_date
+      rescue
+        puts 'first time, no reference date'
+      end
+    end
+
+    inputHash.each do |order|
+      # byebug;
+      sale_date = Date.parse(order[order.keys.first].split(' ')[0])
+
+      if @last_locher_order
+        if sale_date <= @last_locher_order
+          pp "skipped"
+          next
+        end
+      end
+
+      @account = Account.find_by(account_name: order["CusName"])
+
+      if !@account #account does not exist, create it.
+
+        if order['IsOffPremise'] == 'FALSE'
+          on_premise = true
+        else
+          on_premise = false
+        end
+
+        @account = Account.create(
+          account_name: order["CusName"],
+          distributer_id: 2,
+          on_premise: on_premise
+        )
+        stats = {**stats, "newAccounts" => stats["newAccounts"] + 1}
+      end
+
+      distributer_product = DistributerProduct.find_by(name: order['ItemName'])
+
+
+      if !distributer_product
+        distributer_product = DistributerProduct.create(name: order['ItemName'], distributer_id: 2)
+
+        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id)
+        stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
+      else
+        if distributer_product.product_id
+          
+          @account.orders.create(sale_date: sale_date, product_id: distributer_product.product_id)
+          stats = {**stats, "assignedOrders" => stats["assignedOrders"] + 1}
+        else
+          
+          @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id, distributer_id: 2)
+          stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
+        end
+      end
+
+    end
+  end
+
+  def process_jj_report(inputHash)
 
     #Sample jj order
     # {"ShipCity"=>"RED WING",
@@ -83,7 +225,25 @@ class ReportsController < ApplicationController
     product_list = Product.pluck(:product_name)
     # jarow = FuzzyStringMatch::JaroWinkler.create( :pure )
 
+    begin
+      @last_jj_order = Distributer.first.orders.order("sale_date DESC").take.sale_date
+    rescue
+      begin
+        @last_jj_order = Distributer.first.unknown_orders.order("sale_date DESC").take.sale_date
+      rescue
+        puts 'first time, no reference date'
+      end
+    end
+
     inputHash.each do |order|
+
+      sale_date = Date.strptime(order['SalesDate'].split(' ')[0], "%m/%d/%Y")
+
+      if @last_jj_order
+        if sale_date <= @last_jj_order
+          next
+        end
+      end
 
       @account = Account.find_by(account_name: order["CusName"])
 
@@ -106,40 +266,27 @@ class ReportsController < ApplicationController
       distributer_product = DistributerProduct.find_by(name: order['Brand'])
 
 
-
       if !distributer_product
         distributer_product = DistributerProduct.create(name: order['Brand'], distributer_id: 1)
-
-        sale_date = Date.strptime(order['SalesDate'].split(' ')[0], "%m/%d/%Y")
 
         @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id)
         stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
       else
         if distributer_product.product_id
-          sale_date = Date.strptime(order['SalesDate'].split(' ')[0], "%m/%d/%Y")
+          
           @account.orders.create(sale_date: sale_date, product_id: distributer_product.product_id)
           stats = {**stats, "assignedOrders" => stats["assignedOrders"] + 1}
         else
-          sale_date = Date.strptime(order['SalesDate'].split(' ')[0], "%m/%d/%Y")
+          
           @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id, distributer_id: 1)
           stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
         end
       end
 
+    end
 
 
-
-      # if distance > 0.75 #Create order
-        # @account.orders.create(sale_date: order['SalesDate'].split(" ")[0], product_id: product.id)
-        # stats = {**stats, "assignedOrders" => stats["assignedOrders"] + 1}
-      # else #If product similarity is below 0.75, assign it to an unknown product later processing
-        # @account.unknown_orders.create(sale_date: order['SalesDate'].split(" ")[0], product_name: order['Brand'].split(' ')[1..-1].join(' '))
-        # stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
-      # end
   end
 
-  stats
-
-  end
 
 end
