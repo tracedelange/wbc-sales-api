@@ -103,36 +103,25 @@ class ReportsController < ApplicationController
         stats = {**stats, "newAccounts" => stats["newAccounts"] + 1}
       end
 
-      # product_list = Product.pluck(:product_name)
-
-      # productName = nil
-      # distance = -1
-      # trimmedBrand = order['Brand'].split(' ')[1..-1].join(' ')
-      
-      # product_list.each do |product_name|
-
-      #   d = jarow.getDistance(trimmedBrand, product_name)
-        
-      #   if d > distance
-      #     distance = d
-      #     productName = product_name
-      #   end
-      # end
-
-      # product = Product.find_by(product_name: productName)
-
       distributer_product = DistributerProduct.find_by(name: order['Brand'])
+
+
 
       if !distributer_product
         distributer_product = DistributerProduct.create(name: order['Brand'], distributer_id: 1)
-        @account.unknown_orders.create(sale_date: order['SalesDate'].split(' ')[0], distributer_product_id: distributer_product.id)
+
+        sale_date = Date.strptime(order['SalesDate'].split(' ')[0], "%m/%d/%Y")
+
+        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id)
         stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
       else
         if distributer_product.product_id
-          @account.orders.create(sale_date: order['SalesDate'].split(' ')[0], product_id: distributer_product.product_id)
+          sale_date = Date.strptime(order['SalesDate'].split(' ')[0], "%m/%d/%Y")
+          @account.orders.create(sale_date: sale_date, product_id: distributer_product.product_id)
           stats = {**stats, "assignedOrders" => stats["assignedOrders"] + 1}
         else
-          @account.unknown_orders.create(sale_date: order['SalesDate'].split(' ')[0], distributer_product_id: distributer_product.id, distributer_id: 1)
+          sale_date = Date.strptime(order['SalesDate'].split(' ')[0], "%m/%d/%Y")
+          @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id, distributer_id: 1)
           stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
         end
       end
