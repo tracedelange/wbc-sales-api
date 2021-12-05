@@ -8,8 +8,8 @@ gem 'rails', '~> 6.1.4', '>= 6.1.4.1'
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3', '~> 1.4'
 
-# gem 'postgres'
-gem 'pg'
+# # gem 'postgres'
+# gem 'pg'
 
 # gem 'active_model_serializers'
 
@@ -26,6 +26,7 @@ gem 'bcrypt', '~> 3.1.7'
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
+gem 'pg'
 
 gem 'dotenv-rails'
 
