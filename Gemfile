@@ -8,8 +8,8 @@ gem 'rails', '~> 6.1.4', '>= 6.1.4.1'
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3', '~> 1.4'
 
-# gem 'postgres'
-gem 'pg'
+# # gem 'postgres'
+# gem 'pg'
 
 # gem 'active_model_serializers'
 
@@ -57,3 +57,4 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'pg'
