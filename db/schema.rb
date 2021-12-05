@@ -12,6 +12,9 @@
 
 ActiveRecord::Schema.define(version: 2021_11_29_214406) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "accounts", force: :cascade do |t|
     t.string "account_name"
     t.integer "distributer_id"
@@ -57,7 +60,6 @@ ActiveRecord::Schema.define(version: 2021_11_29_214406) do
     t.integer "distributer_product_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "distributor_id"
     t.integer "distributer_id"
   end
 
