@@ -10,6 +10,10 @@ Rails.application.routes.draw do
   get '/me', to: 'users#me'
   get '/users/search', to: 'users#search'
 
+  # get '/order-graph/:product_id', to: 'charts#search'
+
+  get '/graphs/:product_id', to: 'graphs#search'
+
 
   get "/accounts/by_order_count", to: "accounts#most_orders"
 
