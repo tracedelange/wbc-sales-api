@@ -1,5 +1,5 @@
 class ProductSerializer < ActiveModel::Serializer
-  attributes :id, :product_name, :order_count, :account_count, :month_order_count, :six_month_order_count, :ytd_order_count
+  attributes :id, :product_name, :order_count, :account_count, :month_order_count, :six_month_order_count, :ytd_order_count, :order_percentage_of_total #, :graph_orders
 
   has_many :distributer_products
 
@@ -27,6 +27,30 @@ class ProductSerializer < ActiveModel::Serializer
   def account_count
     getSelf
     @product.orders.distinct.pluck(:account_id).count
+  end
+
+  def order_percentage_of_total
+    getSelf
+    (Float(@product.orders.count) / Float(Order.all.count) * 100).round(2)
+  end
+
+  def graph_orders
+    getSelf
+    @orders = Order.where(product_id: @product.id).group('sale_date').order('sale_date ASC').count
+
+    result = {}
+    (@orders.first[0]..Date.today()).each do |date|
+      # Do stuff with date
+      # byebug;
+      if @orders[date] != nil
+        result[date] = @orders[date]
+      else 
+        result[date] = 0
+      end
+    end
+
+    result
+
   end
 
   private

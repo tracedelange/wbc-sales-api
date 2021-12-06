@@ -29,12 +29,14 @@ class ReportsController < ApplicationController
           #Process Locher Report
           results = process_locher_report(report)
 
-          render json: {"results" => results}
+          render json: {"processing_stats" => results}
           
 
         when 3
           #Process Self report
-          render json: {"dis" => "WBC"}
+
+          results = process_wbc_report(report)
+          render json: {"processing_stats" => results}
           
         end
         
@@ -68,16 +70,16 @@ class ReportsController < ApplicationController
       @last_wbc_order = Distributer.third.orders.order("sale_date DESC").take.sale_date
     rescue
       begin
-        @last_wbc_order = Distributer.second.unknown_orders.order("sale_date DESC").take.sale_date
+        @last_wbc_order = Distributer.third.unknown_orders.order("sale_date DESC").take.sale_date
       rescue
         puts 'first time, no reference date'
       end
     end
 
+
     inputHash.each do |order|
 
       sale_date = Date.strptime(order['Delivery Date'].split(' ')[0], "%m/%d/%Y")
-
       if @last_wbc_order
         if sale_date <= @last_wbc_order
           next
@@ -124,10 +126,14 @@ class ReportsController < ApplicationController
       end
 
     end
+    stats
   end
 
-  def process_locher_report(inputHash)
 
+
+
+
+  def process_locher_report(inputHash)
 
     stats = {"newAccounts" => 0, "assignedOrders" => 0, "unassignedOrders" => 0}
 
@@ -194,6 +200,7 @@ class ReportsController < ApplicationController
       end
 
     end
+    stats
   end
 
   def process_jj_report(inputHash)
@@ -285,6 +292,7 @@ class ReportsController < ApplicationController
 
     end
 
+    stats
 
   end
 
