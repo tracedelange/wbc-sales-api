@@ -86,7 +86,7 @@ class ReportsController < ApplicationController
         end
       end
 
-      @account = Account.find_by(account_name: order["Compan"])
+      @account = Account.find_by(account_name: order["Company"])
 
       if !@account #account does not exist, create it.
 
@@ -102,6 +102,11 @@ class ReportsController < ApplicationController
           distributer_id: 3,
           on_premise: on_premise
         )
+
+        if !@account.valid?
+          next
+        end
+        
         stats = {**stats, "newAccounts" => stats["newAccounts"] + 1}
       end
 
@@ -111,7 +116,7 @@ class ReportsController < ApplicationController
       if !distributer_product
         distributer_product = DistributerProduct.create(name: order['Item'], distributer_id: 3)
 
-        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id)
+        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id, distributer_id: 3)
         stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
       else
         if distributer_product.product_id
@@ -176,11 +181,19 @@ class ReportsController < ApplicationController
           distributer_id: 2,
           on_premise: on_premise
         )
+
+        if !@account.valid?
+          next
+        end
+
         stats = {**stats, "newAccounts" => stats["newAccounts"] + 1}
       end
 
       distributer_product = DistributerProduct.find_by(name: order['ItemName'])
 
+      # pp distributer_product
+      # pp @account
+      # pp order
 
       if !distributer_product
         distributer_product = DistributerProduct.create(name: order['ItemName'], distributer_id: 2)
@@ -267,6 +280,10 @@ class ReportsController < ApplicationController
           distributer_id: 1,
           on_premise: on_premise
         )
+        if !@account.valid?
+          next
+        end
+        
         stats = {**stats, "newAccounts" => stats["newAccounts"] + 1}
       end
 
@@ -295,6 +312,7 @@ class ReportsController < ApplicationController
     stats
 
   end
+  
 
 
 end
