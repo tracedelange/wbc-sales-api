@@ -116,6 +116,10 @@ class ReportsController < ApplicationController
       if !distributer_product
         distributer_product = DistributerProduct.create(name: order['Item'], distributer_id: 3)
 
+        if !distributer_product.valid?
+          next
+        end
+
         @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id, distributer_id: 3)
         stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
       else
@@ -197,6 +201,10 @@ class ReportsController < ApplicationController
 
       if !distributer_product
         distributer_product = DistributerProduct.create(name: order['ItemName'], distributer_id: 2)
+
+        if !distributer_product.valid?
+          next
+        end
 
         @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id)
         stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
@@ -292,6 +300,10 @@ class ReportsController < ApplicationController
 
       if !distributer_product
         distributer_product = DistributerProduct.create(name: order['Brand'], distributer_id: 1)
+        
+        if !distributer_product.valid?
+          next
+        end
 
         @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id)
         stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}

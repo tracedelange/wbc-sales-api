@@ -4,4 +4,6 @@ class Distributer < ApplicationRecord
     has_many :unknown_orders
     has_many :orders, through: :accounts
 
+    validates :name, uniqueness: true
+
 end

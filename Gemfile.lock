@@ -93,6 +93,7 @@ GEM
     ffi (1.15.4)
     fuzzy-string-match (1.0.1)
       RubyInline (>= 3.8.6)
+    geocoder (1.7.0)
     globalid (0.5.2)
       activesupport (>= 5.0)
     i18n (1.8.11)
@@ -186,6 +187,7 @@ DEPENDENCIES
   dotenv-rails
   faker
   fuzzy-string-match
+  geocoder
   jwt
   listen (~> 3.3)
   pg (~> 1.1)
