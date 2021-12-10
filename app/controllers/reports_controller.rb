@@ -65,7 +65,7 @@ class ReportsController < ApplicationController
 
   def process_wbc_report(input)
 
-    byebug;
+
 
     stats = {"newAccounts" => 0, "assignedOrders" => 0, "unassignedOrders" => 0}
 
@@ -111,7 +111,10 @@ class ReportsController < ApplicationController
         @account = Account.create(
           account_name: order[0],
           distributer_id: 3,
-          on_premise: on_premise
+          on_premise: on_premise,
+          address: order[1],
+          city: order[2],
+          state: order[3]
         )
 
         if !@account.valid?
@@ -198,7 +201,10 @@ class ReportsController < ApplicationController
         @account = Account.create(
           account_name: order[1],
           distributer_id: 2,
-          on_premise: on_premise
+          on_premise: on_premise,
+          address: order[2],
+          city: order[3],
+          state: order[4] 
         )
 
         if !@account.valid?
@@ -301,7 +307,10 @@ class ReportsController < ApplicationController
         @account = Account.create(
           account_name: order[5],
           distributer_id: 1,
-          on_premise: on_premise
+          on_premise: on_premise,
+          address: order[2],
+          city: order[0],
+          state: order[1] 
         )
         if !@account.valid?
           next

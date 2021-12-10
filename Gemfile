@@ -13,7 +13,7 @@ gem 'rails', '~> 6.1.4', '>= 6.1.4.1'
 
 # gem 'active_model_serializers'
 
-
+gem 'httparty'
 
 # Use Puma as the app server
 gem 'puma', '~> 5.0'

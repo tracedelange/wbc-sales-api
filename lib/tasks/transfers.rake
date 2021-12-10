@@ -19,7 +19,6 @@ namespace :transfers do
           presentAccount = Account.find_by(account_name: existingData['JJname'])
 
           if presentAccount
-            pp existingData['coordinates']
             coordinates = existingData['coordinates']
             lat = coordinates.split(',')[0].split(' ')[-1]
             long = coordinates.split(',')[-1].split(' ')[-1].delete('}')
@@ -37,11 +36,6 @@ namespace :transfers do
           end
 
         end
-
-        # accountSearch = Account.where(account_name: result['customers'][customerKey]['JJname'])
-        # if accountSearch.length > 1
-        #   pp accountSearch
-        # end
 
           
       end
