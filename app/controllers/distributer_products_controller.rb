@@ -21,6 +21,18 @@ class DistributerProductsController < ApplicationController
             @distributerProduct.update(product_id: distributer_products_params[:product_id])
 
             if @distributerProduct.valid?
+
+                UnknownOrder.where(distributer_product_id: @distributerProduct.id).each do |unknown_order|
+              
+                    product = @distributerProduct.product
+            
+                    newOrder = Order.create(account_id: unknown_order.account_id, sale_date: unknown_order.sale_date, product_id: product.id)
+            
+                    if newOrder.valid?
+                        unknown_order.delete
+                    end
+                  end
+
                 render json: @distributerProduct, status: :ok
             else
                 render json: {error: 'Distributer Product could not be assigned.'}, status: :unprocessable_entity
@@ -31,9 +43,6 @@ class DistributerProductsController < ApplicationController
         end
 
     end
-
-
-
 
     private
 
