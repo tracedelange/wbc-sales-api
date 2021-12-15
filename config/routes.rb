@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
   get "/account_query/name", to: "account_queries#query_by_name"
   get "/account_query/alpha_page", to: "account_queries#alphabetical_pagination"
+  get "/account_query/order_page", to: "account_queries#order_count_pagination"
   get "/account_query/by_order_count", to: "account_queries#most_orders"
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html

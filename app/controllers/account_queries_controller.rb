@@ -10,6 +10,14 @@ class AccountQueriesController < ApplicationController
         
     end
 
+    def order_count_pagination #returns shallow information about a subset of accounts based off a pagination value.
+
+        get_page
+        accounts = Account.joins(:orders).group("order.account_id").order('count(orders.account_id) DESC').limit(20).offset(@offset)
+        render json: accounts, status: :ok
+        
+    end
+
     def query_by_name
 
         accounts = Account.where('display_name LIKE :snakesearch OR account_name LIKE :upsearch', upsearch: "%#{query_params[:name].upcase}%", snakesearch: "%#{query_params[:name].titleize}%")
