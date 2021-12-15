@@ -5,6 +5,8 @@ Rails.application.routes.draw do
 
   resources :accounts, only: [:show, :update]
 
+  resources :transfers, only: [:create]
+
   resources :distributer_products, only: [:show, :update]
 
   post '/login', to: 'sessions#create'
