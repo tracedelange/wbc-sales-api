@@ -1,5 +1,5 @@
 class AccountSerializer < ActiveModel::Serializer
-  attributes :id, :on_premise, :display_name, :account_name, :address, :city, :state, :ytd_order_count, :month_order_count
+  attributes :id, :on_premise, :display_name, :account_name, :address, :city, :state, :latitude, :longitude, :hidden, :ytd_order_count, :month_order_count
 
 
 

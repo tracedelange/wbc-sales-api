@@ -15,6 +15,23 @@ class AccountsController < ApplicationController
 
     def update
 
+        account = Account.find_by(id: accounts_params[:id])
+
+        if account
+
+            account.update(accounts_params)
+
+            if account.valid? 
+                render json: account, status: :ok
+            else
+                render json: {'error' => account.errors}
+            end
+
+
+        else
+            render json: {'error' => 'Account not found.'}, status: 404
+        end
+
     end
 
 
@@ -24,7 +41,7 @@ class AccountsController < ApplicationController
     private
 
     def accounts_params
-        params.permit(:page, :id)
+        params.permit(:id, :hidden, :display_name, :address, :city, :state, :latitude, :longitude)
     end
 
 
