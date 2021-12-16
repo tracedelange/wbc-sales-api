@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   resources :accounts, only: [:show, :update]
 
   resources :transfers, only: [:create]
+  resources :warnings, only: [:index]
 
   resources :distributer_products, only: [:show, :update]
 
@@ -18,11 +19,14 @@ Rails.application.routes.draw do
 
   get '/graphs/:product_id', to: 'graphs#search'
 
+  get '/order_query', to: 'order_queries#show'
 
   get "/account_query/name", to: "account_queries#query_by_name"
   get "/account_query/alpha_page", to: "account_queries#alphabetical_pagination"
   get "/account_query/order_page", to: "account_queries#order_count_pagination"
-  get "/account_query/by_order_count", to: "account_queries#most_orders"
+  get "/account_query/need_display", to: "account_queries#need_display"
+
+  # get "/account_query/by_order_count", to: "account_queries#most_orders"
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end
