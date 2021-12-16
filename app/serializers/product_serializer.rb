@@ -3,16 +3,16 @@ class ProductSerializer < ActiveModel::Serializer
 
   has_many :distributer_products
 
-  def month_order_count
-    getSelf
-    @product.orders.where(sale_date: (Time.now.midnight - 1.month)..Time.now.midnight ).count
-  end
-  
   def six_month_order_count
     getSelf
     @product.orders.where(sale_date: (Time.now.midnight - 6.month)..Time.now.midnight ).count
   end
   
+  def month_order_count
+    getSelf
+    @product.orders.where(sale_date: (Time.now.midnight - 1.month)..Time.now.midnight ).count
+  end
+
   def ytd_order_count
     getSelf
     @product.orders.where(sale_date: (Time.now.beginning_of_year)..Time.now.midnight ).count

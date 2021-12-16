@@ -38,6 +38,15 @@ Product.create(product_name: 'WacTown Wheat')
 Product.create(product_name: 'Carver County Kolsch')
 Product.create(product_name: 'Raspberry Blonde')
 Product.create(product_name: 'Cookies and Cream Milk Stout')
+Product.create(product_name: "Wagner's Bay IPA")
+Product.create(product_name: 'Laketown Brown')
+Product.create(product_name: 'Mango Kolsch')
+Product.create(product_name: 'Main Street Variety Pack')
+Product.create(product_name: 'Chunka Chunka')
+Product.create(product_name: 'Final Circle Shandy')
+Product.create(product_name: 'Golden Cookie Ale')
+Product.create(product_name: 'Strawberry Lemonade Seltzer')
+Product.create(product_name: 'Oktoberfest')
 
 
 # for n in 0...1000

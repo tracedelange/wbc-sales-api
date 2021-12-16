@@ -31,3 +31,9 @@
 /config/master.key
 
 .env
+
+/reports
+
+12_08_2021_backup.json
+
+*.csv

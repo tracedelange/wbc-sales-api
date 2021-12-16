@@ -1,3 +1,5 @@
+require 'csv'
+
 class ReportsController < ApplicationController
   def index
 
@@ -11,7 +13,7 @@ class ReportsController < ApplicationController
     if params[:distributer_id] && request.body
 
       distributer = Distributer.find_by(id: params[:distributer_id])
-      report = CsvHash.parse(request.body)
+      report = CSV.parse(request.body, headers: true)
 
       if distributer && report.length > 0
         
@@ -35,10 +37,15 @@ class ReportsController < ApplicationController
         when 3
           #Process Self report
 
+          #passing adjusted csv format for wbc reports. Headers behaving oddly.
+          # wbcreport = CSV.parse(request.body)
+
           results = process_wbc_report(report)
           render json: {"processing_stats" => results}
           
         end
+
+
         
         
       else
@@ -58,7 +65,8 @@ class ReportsController < ApplicationController
   private
 
 
-  def process_wbc_report(inputHash)
+  def process_wbc_report(input)
+
 
 
     stats = {"newAccounts" => 0, "assignedOrders" => 0, "unassignedOrders" => 0}
@@ -76,17 +84,22 @@ class ReportsController < ApplicationController
       end
     end
 
+    input.each do |order|
 
-    inputHash.each do |order|
+      #For some reason the headers are being read into the bottom of the CSV table. Reader breaks when it tries to read nil values, this check below is to catch
+      #the headers at the end of the loop.
+      if order["Company"] == nil
+        next
+      end
 
-      sale_date = Date.strptime(order['Delivery Date'].split(' ')[0], "%m/%d/%Y")
+      sale_date = Date.strptime(order[5].split(' ')[0], "%m/%d/%Y")
       if @last_wbc_order
         if sale_date <= @last_wbc_order
           next
         end
       end
 
-      @account = Account.find_by(account_name: order["Compan"])
+      @account = Account.find_by(account_name: order[0])
 
       if !@account #account does not exist, create it.
 
@@ -98,20 +111,32 @@ class ReportsController < ApplicationController
 
 
         @account = Account.create(
-          account_name: order["Company"],
+          account_name: order[0],
           distributer_id: 3,
-          on_premise: on_premise
+          on_premise: on_premise,
+          address: order[1],
+          city: order[2],
+          state: order[3]
         )
+
+        if !@account.valid?
+          next
+        end
+        
         stats = {**stats, "newAccounts" => stats["newAccounts"] + 1}
       end
 
-      distributer_product = DistributerProduct.find_by(name: order['Item'])
+      distributer_product = DistributerProduct.find_by(name: order[6])
 
 
       if !distributer_product
-        distributer_product = DistributerProduct.create(name: order['Item'], distributer_id: 3)
+        distributer_product = DistributerProduct.create(name: order[6], distributer_id: 3)
 
-        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id)
+        if !distributer_product.valid?
+          next
+        end
+
+        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id, distributer_id: 3)
         stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
       else
         if distributer_product.product_id
@@ -133,7 +158,7 @@ class ReportsController < ApplicationController
 
 
 
-  def process_locher_report(inputHash)
+  def process_locher_report(input)
 
     stats = {"newAccounts" => 0, "assignedOrders" => 0, "unassignedOrders" => 0}
 
@@ -150,9 +175,9 @@ class ReportsController < ApplicationController
       end
     end
 
-    inputHash.each do |order|
+    input.each do |order|
       # byebug;
-      sale_date = Date.parse(order[order.keys.first].split(' ')[0])
+      sale_date = Date.parse(order[0].split(' ')[0])
 
       if @last_locher_order
         if sale_date <= @last_locher_order
@@ -161,31 +186,50 @@ class ReportsController < ApplicationController
         end
       end
 
-      @account = Account.find_by(account_name: order["CusName"])
+      # if order[1] == "BURKY'S BAR AND GRILL EFT"
+        # byebug;
+      # end
+
+      @account = Account.find_by(account_name: order[1])
 
       if !@account #account does not exist, create it.
 
-        if order['IsOffPremise'] == 'FALSE'
+        if order[8] == 'FALSE'
           on_premise = true
         else
           on_premise = false
         end
 
         @account = Account.create(
-          account_name: order["CusName"],
+          account_name: order[1],
           distributer_id: 2,
-          on_premise: on_premise
+          on_premise: on_premise,
+          address: order[2],
+          city: order[3],
+          state: order[4] 
         )
+
+        if !@account.valid?
+          next
+        end
+
         stats = {**stats, "newAccounts" => stats["newAccounts"] + 1}
       end
 
-      distributer_product = DistributerProduct.find_by(name: order['ItemName'])
+      distributer_product = DistributerProduct.find_by(name: order[6])
 
+      # pp distributer_product
+      # pp @account
+      # pp order
 
       if !distributer_product
-        distributer_product = DistributerProduct.create(name: order['ItemName'], distributer_id: 2)
+        distributer_product = DistributerProduct.create(name: order[6], distributer_id: 2)
 
-        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id)
+        if !distributer_product.valid?
+          next
+        end
+
+        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id, distributer_id: 2)
         stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
       else
         if distributer_product.product_id
@@ -203,7 +247,7 @@ class ReportsController < ApplicationController
     stats
   end
 
-  def process_jj_report(inputHash)
+  def process_jj_report(input)
 
     #Sample jj order
     # {"ShipCity"=>"RED WING",
@@ -242,9 +286,9 @@ class ReportsController < ApplicationController
       end
     end
 
-    inputHash.each do |order|
+    input.each do |order|
 
-      sale_date = Date.strptime(order['SalesDate'].split(' ')[0], "%m/%d/%Y")
+      sale_date = Date.strptime(order[14].split(' ')[0], "%m/%d/%Y")
 
       if @last_jj_order
         if sale_date <= @last_jj_order
@@ -252,31 +296,42 @@ class ReportsController < ApplicationController
         end
       end
 
-      @account = Account.find_by(account_name: order["CusName"])
+      @account = Account.find_by(account_name: order[5])
 
       if !@account #account does not exist, create it.
 
-        if order['PremiseType'] == 'OnPremise'
+        if order[4] == 'OnPremise'
           on_premise = true
         else
           on_premise = false
         end
 
         @account = Account.create(
-          account_name: order["CusName"],
+          account_name: order[5],
           distributer_id: 1,
-          on_premise: on_premise
+          on_premise: on_premise,
+          address: order[2],
+          city: order[0],
+          state: order[1] 
         )
+        if !@account.valid?
+          next
+        end
+        
         stats = {**stats, "newAccounts" => stats["newAccounts"] + 1}
       end
 
-      distributer_product = DistributerProduct.find_by(name: order['Brand'])
+      distributer_product = DistributerProduct.find_by(name: order[8])
 
 
       if !distributer_product
-        distributer_product = DistributerProduct.create(name: order['Brand'], distributer_id: 1)
+        distributer_product = DistributerProduct.create(name: order[8], distributer_id: 1)
 
-        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id)
+        if !distributer_product.valid?
+          next
+        end
+
+        @account.unknown_orders.create(sale_date: sale_date, distributer_product_id: distributer_product.id, distributer_id: 1)
         stats = {**stats, "unassignedOrders" => stats["unassignedOrders"] + 1}
       else
         if distributer_product.product_id
@@ -295,6 +350,7 @@ class ReportsController < ApplicationController
     stats
 
   end
+  
 
 
 end

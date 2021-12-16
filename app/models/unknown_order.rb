@@ -3,4 +3,6 @@ class UnknownOrder < ApplicationRecord
     belongs_to :distributer
     belongs_to :distributer_product
 
+    # validates :name, presence: :true
+
 end
