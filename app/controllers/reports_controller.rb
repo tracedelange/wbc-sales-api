@@ -24,12 +24,20 @@ class ReportsController < ApplicationController
 
           results = process_jj_report(report)
 
+          if results.new_account_count > 0
+            GeocodeAccountsJob.perform_later
+          end
+
           render json: results, status: :accepted
           
         when 2
 
           #Process Locher Report
           results = process_locher_report(report)
+
+          if results.new_account_count > 0
+            GeocodeAccountsJob.perform_later
+          end
 
           render json: results
           
@@ -41,6 +49,11 @@ class ReportsController < ApplicationController
           # wbcreport = CSV.parse(request.body)
 
           results = process_wbc_report(report)
+
+          if results.new_account_count > 0
+            GeocodeAccountsJob.perform_later
+          end
+
           render json: results
           
         end
