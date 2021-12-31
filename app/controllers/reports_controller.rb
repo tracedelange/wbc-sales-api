@@ -24,14 +24,14 @@ class ReportsController < ApplicationController
 
           results = process_jj_report(report)
 
-          render json: {"processing_stats" => results}, status: :accepted
+          render json: results, status: :accepted
           
         when 2
 
           #Process Locher Report
           results = process_locher_report(report)
 
-          render json: {"processing_stats" => results}
+          render json: results
           
 
         when 3
@@ -41,7 +41,7 @@ class ReportsController < ApplicationController
           # wbcreport = CSV.parse(request.body)
 
           results = process_wbc_report(report)
-          render json: {"processing_stats" => results}
+          render json: results
           
         end
 
@@ -151,12 +151,18 @@ class ReportsController < ApplicationController
       end
 
     end
-    stats
+    # stats
+
+    rr = ReportReceipt.create(
+      distributer_id: 1,
+      assigned_order_count: stats["assignedOrders"],
+      unassigned_order_count: stats["unassignedOrders"],
+      new_account_count: stats["newAccounts"]
+    )
+
+    rr
+
   end
-
-
-
-
 
   def process_locher_report(input)
 
@@ -244,32 +250,20 @@ class ReportsController < ApplicationController
       end
 
     end
-    stats
+    # stats
+
+    rr = ReportReceipt.create(
+      distributer_id: 2,
+      assigned_order_count: stats["assignedOrders"],
+      unassigned_order_count: stats["unassignedOrders"],
+      new_account_count: stats["newAccounts"]
+    )
+
+    rr
   end
 
   def process_jj_report(input)
 
-    #Sample jj order
-    # {"ShipCity"=>"RED WING",
-    #   "ShipState"=>"MN",
-    #   "ShipAdr2"=>"3237 SOUTH SERVICE DRIVE",
-    #   "ShipZip"=>"55066",
-    #   "PremiseType"=>"OffPremise",
-    #   "CusName"=>"MGM - RED WING - M0015",
-    #   "MainDeliveryDriver"=>"Route 3030",
-    #   "MainSalesPerson"=>"Andrew Pieper",
-    #   "Brand"=>"Waconia Choc Pnut Butr Prtr",
-    #   "FrontlinePrice"=>"46.15",
-    #   "ItemKey"=>"11669441",
-    #   "ItemName"=>"Waconia Choc Pnut Butr Prtr 6/4/16 C",
-    #   "Package"=>"6/4/16 C",
-    #   "PackName"=>"CB",
-    #   "SalesDate"=>"11/12/2021 12:00:00 AM",
-    #   "DateRange"=>"1/1 - 11/15/2021 [180SD]",
-    #   "EquivCases"=>"1.3333",
-    #   "Cases"=>"1",
-    #   "Gallons"=>"3",
-    #   "Barrels"=>"0.0968"}
 
     stats = {"newAccounts" => 0, "assignedOrders" => 0, "unassignedOrders" => 0}
 
@@ -347,7 +341,17 @@ class ReportsController < ApplicationController
 
     end
 
-    stats
+    # stats
+    #Create a new report receipt with stats object and return a json version of the receipt
+
+    rr = ReportReceipt.create(
+      distributer_id: 1,
+      assigned_order_count: stats["assignedOrders"],
+      unassigned_order_count: stats["unassignedOrders"],
+      new_account_count: stats["newAccounts"]
+    )
+
+    rr
 
   end
   
