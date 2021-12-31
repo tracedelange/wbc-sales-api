@@ -24,7 +24,7 @@ class ReportsController < ApplicationController
 
           results = process_jj_report(report)
 
-          if results.new_account_count > 0
+          if Integer(results.new_account_count) > 0
             GeocodeAccountsJob.perform_later
           end
 
@@ -35,7 +35,7 @@ class ReportsController < ApplicationController
           #Process Locher Report
           results = process_locher_report(report)
 
-          if results.new_account_count > 0
+          if Integer(results.new_account_count) > 0
             GeocodeAccountsJob.perform_later
           end
 
@@ -50,7 +50,7 @@ class ReportsController < ApplicationController
 
           results = process_wbc_report(report)
 
-          if results.new_account_count > 0
+          if Integer(results.new_account_count) > 0
             GeocodeAccountsJob.perform_later
           end
 
