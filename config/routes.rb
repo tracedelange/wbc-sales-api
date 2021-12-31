@@ -21,6 +21,8 @@ Rails.application.routes.draw do
 
   get '/order_query', to: 'order_queries#show'
 
+  get '/product_query', to: 'products#map_query'
+
   get "/account_query/name", to: "account_queries#query_by_name"
   get "/account_query/alpha_page", to: "account_queries#alphabetical_pagination"
   get "/account_query/order_page", to: "account_queries#order_count_pagination"

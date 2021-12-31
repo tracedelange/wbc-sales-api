@@ -1,5 +1,5 @@
 class OrderQuerySerializer < ActiveModel::Serializer
-  attributes :id, :display_name, :account_name, :latitude, :longitude #, :unique_orders #, each_serialzer: OrderQueryItemSerializer
+  attributes :id, :display_name, :account_name, :latitude, :longitude, :on_premise #, :unique_orders #, each_serialzer: OrderQueryItemSerializer
 
   # has_many :orders, serializer: OrderQueryItemSerializer, time_range: @instance_options[:time_range]
 
@@ -21,6 +21,8 @@ class OrderQuerySerializer < ActiveModel::Serializer
     Order.where(sale_date: time_range, account_id: self.object.id)
     .select('DISTINCT ON ("product_id") *')
     .order('product_id, sale_date DESC')
+    
+
 
   end
 
