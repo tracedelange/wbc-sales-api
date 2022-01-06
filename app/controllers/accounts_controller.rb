@@ -41,7 +41,7 @@ class AccountsController < ApplicationController
     private
 
     def accounts_params
-        params.permit(:id, :hidden, :display_name, :address, :city, :state, :latitude, :longitude)
+        params.permit(:id, :hidden, :display_name, :address, :city, :state, :latitude, :longitude, :on_premise)
     end
 
 

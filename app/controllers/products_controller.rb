@@ -1,5 +1,8 @@
 class ProductsController < ApplicationController
 
+    skip_before_action :authorized, only: [:map_query]
+
+
     def index
         render json: Product.all, status: :ok
     end
@@ -42,6 +45,14 @@ class ProductsController < ApplicationController
         else
             render json: {"error" => "Cannot delete product."}, status: :unprocessable_entity
         end
+    end
+
+    def map_query
+        time_range = (Time.now.midnight - 3.month)..Time.now.midnight
+
+        results = Product.joins(:orders).where('orders.sale_date' => time_range).distinct
+
+        render json: results, each_serializer: ProductMapQuerySerializer
     end
 
     private
