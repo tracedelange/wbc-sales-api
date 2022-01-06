@@ -3,7 +3,9 @@ Rails.application.routes.draw do
   resources :distributers, only: [:index, :show]
   resources :products
 
-  resources :accounts, only: [:show, :update]
+  resources :accounts, only: [:show, :update] do
+    resources :orders, only: [:index, :show]
+  end
 
   resources :transfers, only: [:create]
   resources :warnings, only: [:index]
